@@ -4,7 +4,7 @@ import { ArrowRight, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-//import Pricing from "@/components/pricing";
+import Pricing from "@/components/pricing";
 import { creditBenefits, features, testimonials } from "@/lib/data";
 
 export default function Home() {
@@ -119,7 +119,7 @@ export default function Home() {
 
           <div className="mx-auto">
             {/* Clerk Pricing Table */}
-            {/* <Pricing /> */}
+            <Pricing />
 
             {/* Description */}
             <Card className="mt-12 bg-muted/20 border-emerald-900/30">

@@ -22,11 +22,12 @@ export const checkUser = async () => {
     }
     
     // if no user create one
-    const name = `&{user.firstName} ${user.lastName}`;
+   const name = `${user.firstName} ${user.lastName}`;
+
 
     const newUser = await db.user.create({
       data: {
-        clearkUserId: user.id,
+        clerkUserId: user.id,
         name,
         imageUrl: user.imageUrl,
         email: user.emailAddresses[0].emailAddress,
@@ -42,6 +43,6 @@ export const checkUser = async () => {
 
     return newUser;
   } catch (error) {
-    console.log(error.message);
+    console.error(error);
   }
 };

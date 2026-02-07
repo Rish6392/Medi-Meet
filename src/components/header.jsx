@@ -15,10 +15,10 @@ import { Badge } from "./ui/badge";
 import Image from "next/image";
 
 export default async function Header() {
-  await checkUser();
-  // if (user?.role === "PATIENT") {
-  //   await checkAndAllocateCredits(user);
-  // }
+  const user = await checkUser();
+  if (user?.role === "PATIENT") {
+    await checkAndAllocateCredits(user);
+  }
 
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-10 supports-[backdrop-filter]:bg-background/60">
@@ -37,7 +37,7 @@ export default async function Header() {
         <div className="flex items-center space-x-2">
           <SignedIn>
             {/* Admin Links */}
-            {/* {user?.role === "ADMIN" && (
+            {user?.role === "ADMIN" && (
               <Link href="/admin">
                 <Button
                   variant="outline"
@@ -50,10 +50,10 @@ export default async function Header() {
                   <ShieldCheck className="h-4 w-4" />
                 </Button>
               </Link>
-            )} */}
+            )}
 
             {/* Doctor Links */}
-            {/* {user?.role === "DOCTOR" && (
+            {user?.role === "DOCTOR" && (
               <Link href="/doctor">
                 <Button
                   variant="outline"
@@ -66,10 +66,10 @@ export default async function Header() {
                   <Stethoscope className="h-4 w-4" />
                 </Button>
               </Link>
-            )} */}
+            )}
 
             {/* Patient Links */}
-            {/* {user?.role === "PATIENT" && (
+            {user?.role === "PATIENT" && (
               <Link href="/appointments">
                 <Button
                   variant="outline"
@@ -82,10 +82,10 @@ export default async function Header() {
                   <Calendar className="h-4 w-4" />
                 </Button>
               </Link>
-            )} */}
+            )}
 
             {/* Unassigned Role */}
-            {/* {user?.role === "UNASSIGNED" && (
+            {user?.role === "UNASSIGNED" && (
               <Link href="/onboarding">
                 <Button
                   variant="outline"
@@ -98,10 +98,10 @@ export default async function Header() {
                   <User className="h-4 w-4" />
                 </Button>
               </Link>
-            )} */}
+            )}
           </SignedIn>
 
-          {/* {(!user || user?.role !== "ADMIN") && (
+          {(!user || user?.role !== "ADMIN") && (
             <Link href={user?.role === "PATIENT" ? "/pricing" : "/doctor"}>
               <Badge
                 variant="outline"
@@ -124,7 +124,7 @@ export default async function Header() {
                 </span>
               </Badge>
             </Link>
-          )} */}
+          )}
 
           <SignedOut>
             <SignInButton>
