@@ -14,6 +14,20 @@ export const checkUser = async () => {
       where: {
         clerkUserId: user.id,
       },
+      include:{
+        transactions:{
+          where:{
+            type:"CREDIT_PURCHASE",
+            createdAt:{
+              gte:new Date(new Date().getFullYear(),new Date().getMonth(),1),
+            },
+          },
+          orderBy:{
+            createdAt:"desc",
+          },
+          take:1,
+        }
+      }
     });
     
     // if user
@@ -22,7 +36,7 @@ export const checkUser = async () => {
     }
     
     // if no user create one
-   const name = `${user.firstName} ${user.lastName}`;
+    const name = `${user.firstName} ${user.lastName}`;
 
 
     const newUser = await db.user.create({
