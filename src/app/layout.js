@@ -6,8 +6,6 @@ import Header from "@/components/header";
 import { dark } from "@clerk/themes";
 import { ThemeProvider } from "@/components/theme-provider";
 
-export const runtime = "nodejs";
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
