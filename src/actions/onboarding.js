@@ -15,7 +15,7 @@ export async function setUserRole(formData) {
   }
 
   // Find user in our database
-  const user = await db.user.findunique({
+  const user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
 
@@ -41,7 +41,7 @@ export async function setUserRole(formData) {
       return { success: true, redirect: "/docters" };
     }
 
-    if (role === "DOCTER") {
+    if (role === "DOCTOR") {
       const specialty = formData.get("specialty");
       const experience = parseInt(formData.get("experience"), 10);
       const credentialUrl = formData.get("credentialUrl");
