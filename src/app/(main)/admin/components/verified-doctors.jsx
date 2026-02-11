@@ -59,7 +59,7 @@ export function VerifiedDoctors({ doctors }) {
       const actionVerb = actionType === "SUSPEND" ? "Suspended" : "Reinstated";
       toast.success(`${actionVerb} ${targetDoctor.name} successfully!`);
       setTargetDoctor(null);
-      setActionType(null);
+      setActionType(null);     
     }
   }, [data]);
 
