@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { getDoctorAppointments } from "@/actions/doctor";
-import { AppointmentCard } from "@/components/appointment-card";
+//import { AppointmentCard } from "@/components/appointment-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import useFetch from "@/hooks/use-fetch";
