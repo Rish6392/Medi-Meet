@@ -9,10 +9,19 @@ import { addDays, addMinutes, format, isBefore, endOfDay } from "date-fns";
 import { Auth } from "@vonage/auth";
 
 // Initialize Vonage Video API client
+import fs from "fs";
+import path from "path";
+
+const privateKey = fs.readFileSync(
+  path.join(process.cwd(), "src/lib/private.key"),
+  "utf8"
+);
+
 const credentials = new Auth({
-  applicationId: process.env.NEXT_PUBLIC_VONAGE_APPLICATION_ID,
-  privateKey: process.env.VONAGE_PRIVATE_KEY,
+  applicationId: process.env.VONAGE_APPLICATION_ID,
+  privateKey: privateKey,
 });
+
 const options = {};
 const vonage = new Vonage(credentials, options);
 
@@ -28,7 +37,7 @@ export async function bookAppointment(formData) {
 
   try {
     // Get the patient user
-    const patient = await db.user.findUnique({
+    const patient = await db.user.findFirst({
       where: {
         clerkUserId: userId,
         role: "PATIENT",
