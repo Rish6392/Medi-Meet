@@ -15,9 +15,12 @@ import { checkAndAllocateCredits } from "@/actions/credits";
 import Image from "next/image";
 
 export default async function Header() {
-  const user = await checkUser();
+  let user = await checkUser();
   if (user?.role === "PATIENT") {
-    await checkAndAllocateCredits(user);
+    const updatedUser = await checkAndAllocateCredits(user);
+    if (updatedUser) {
+      user = { ...user, ...updatedUser };
+    }
   }
 
   return (

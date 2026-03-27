@@ -31,10 +31,44 @@ export function AvailabilitySettings({ slots }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      startTime: "",
-      endTime: "",
+      startHour: "09",
+      startMinute: "00",
+      startPeriod: "AM",
+      endHour: "05",
+      endMinute: "00",
+      endPeriod: "PM",
     },
   });
+
+  const hourOptions = [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+  ];
+
+  const minuteOptions = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
+
+  const periodOptions = ["AM", "PM"];
+
+  function to24HourTime(hour12, minute, period) {
+    const parsedHour = Number(hour12);
+    let hour24 = parsedHour % 12;
+
+    if (period === "PM") {
+      hour24 += 12;
+    }
+
+    return `${hour24.toString().padStart(2, "0")}:${minute}`;
+  }
 
   function createLocalDateFromTime(timeStr) {
     const [hours, minutes] = timeStr.split(":").map(Number);
@@ -50,16 +84,26 @@ export function AvailabilitySettings({ slots }) {
   }
 
   // Handle slot submission
-  const onSubmit = async (data) => {
+  const onSubmit = async (formValues) => {
     if (loading) return;
 
     const formData = new FormData();
 
-    const today = new Date().toISOString().split("T")[0];
+    const startTime24 = to24HourTime(
+      formValues.startHour,
+      formValues.startMinute,
+      formValues.startPeriod
+    );
+
+    const endTime24 = to24HourTime(
+      formValues.endHour,
+      formValues.endMinute,
+      formValues.endPeriod
+    );
 
     // Create date objects
-    const startDate = createLocalDateFromTime(data.startTime);
-    const endDate = createLocalDateFromTime(data.endTime);
+    const startDate = createLocalDateFromTime(startTime24);
+    const endDate = createLocalDateFromTime(endTime24);
 
     if (startDate >= endDate) {
       toast.error("End time must be after start time");
@@ -84,7 +128,7 @@ export function AvailabilitySettings({ slots }) {
   const formatTimeString = (dateString) => {
     try {
       return format(new Date(dateString), "h:mm a");
-    } catch (e) {
+    } catch (_error) {
       return "Invalid time";
     }
   };
@@ -159,32 +203,114 @@ export function AvailabilitySettings({ slots }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startTime">Start Time</Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  {...register("startTime", {
-                    required: "Start time is required",
-                  })}
-                  className="bg-background border-emerald-900/20"
-                />
-                {errors.startTime && (
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    {...register("startHour", {
+                      required: "Start hour is required",
+                    })}
+                    className="flex h-9 w-full rounded-md border border-emerald-900/20 bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {hourOptions.map((hour) => (
+                      <option key={`start-hour-${hour}`} value={hour}>
+                        {hour}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    {...register("startMinute", {
+                      required: "Start minute is required",
+                    })}
+                    className="flex h-9 w-full rounded-md border border-emerald-900/20 bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {minuteOptions.map((minute) => (
+                      <option key={`start-minute-${minute}`} value={minute}>
+                        {minute}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    {...register("startPeriod", {
+                      required: "Start period is required",
+                    })}
+                    className="flex h-9 w-full rounded-md border border-emerald-900/20 bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {periodOptions.map((period) => (
+                      <option key={`start-period-${period}`} value={period}>
+                        {period}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.startHour && (
                   <p className="text-sm font-medium text-red-500">
-                    {errors.startTime.message}
+                    {errors.startHour.message}
+                  </p>
+                )}
+                {errors.startMinute && (
+                  <p className="text-sm font-medium text-red-500">
+                    {errors.startMinute.message}
+                  </p>
+                )}
+                {errors.startPeriod && (
+                  <p className="text-sm font-medium text-red-500">
+                    {errors.startPeriod.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="endTime">End Time</Label>
-                <Input
-                  id="endTime"
-                  type="time"
-                  {...register("endTime", { required: "End time is required" })}
-                  className="bg-background border-emerald-900/20"
-                />
-                {errors.endTime && (
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    {...register("endHour", {
+                      required: "End hour is required",
+                    })}
+                    className="flex h-9 w-full rounded-md border border-emerald-900/20 bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {hourOptions.map((hour) => (
+                      <option key={`end-hour-${hour}`} value={hour}>
+                        {hour}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    {...register("endMinute", {
+                      required: "End minute is required",
+                    })}
+                    className="flex h-9 w-full rounded-md border border-emerald-900/20 bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {minuteOptions.map((minute) => (
+                      <option key={`end-minute-${minute}`} value={minute}>
+                        {minute}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    {...register("endPeriod", {
+                      required: "End period is required",
+                    })}
+                    className="flex h-9 w-full rounded-md border border-emerald-900/20 bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {periodOptions.map((period) => (
+                      <option key={`end-period-${period}`} value={period}>
+                        {period}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.endHour && (
                   <p className="text-sm font-medium text-red-500">
-                    {errors.endTime.message}
+                    {errors.endHour.message}
+                  </p>
+                )}
+                {errors.endMinute && (
+                  <p className="text-sm font-medium text-red-500">
+                    {errors.endMinute.message}
+                  </p>
+                )}
+                {errors.endPeriod && (
+                  <p className="text-sm font-medium text-red-500">
+                    {errors.endPeriod.message}
                   </p>
                 )}
               </div>

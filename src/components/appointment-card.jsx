@@ -196,9 +196,11 @@ export function AppointmentCard({
 
   useEffect(() => {
     if (tokenData?.success) {
+      const encodedSessionId = encodeURIComponent(tokenData.videoSessionId);
+      const encodedToken = encodeURIComponent(tokenData.token);
       // Redirect to video call page with token and session ID
       router.push(
-        `/video-call?sessionId=${tokenData.videoSessionId}&token=${tokenData.token}&appointmentId=${appointment.id}`
+        `/video-call?sessionId=${encodedSessionId}&token=${encodedToken}&appointmentId=${appointment.id}`
       );
     } else if (tokenData?.error) {
       setAction(null);

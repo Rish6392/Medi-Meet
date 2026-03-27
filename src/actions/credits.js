@@ -2,7 +2,6 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
 import { format } from "date-fns";
 
 // Define credit allocations per plan
@@ -104,10 +103,6 @@ export async function checkAndAllocateCredits(user) {
 
       return updatedUser;
     });
-
-    // Revalidate relevant paths to reflect updated credit balance
-    revalidatePath("/doctors");
-    revalidatePath("/appointments");
 
     return updatedUser;
   } catch (error) {
