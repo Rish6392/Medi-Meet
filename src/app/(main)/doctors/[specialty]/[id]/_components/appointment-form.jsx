@@ -52,7 +52,10 @@ export function AppointmentForm({ doctorId, slot, onBack, onComplete }) {
         </div>
         <div className="flex items-center">
           <Clock className="h-5 w-5 text-emerald-400 mr-2" />
-          <span className="text-white">{slot.formatted}</span>
+          <span className="text-white">
+            {format(new Date(slot.startTime), "h:mm a")} -{" "}
+            {format(new Date(slot.endTime), "h:mm a")}
+          </span>
         </div>
         <div className="flex items-center">
           <CreditCard className="h-5 w-5 text-emerald-400 mr-2" />
