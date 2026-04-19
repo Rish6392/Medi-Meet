@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { deductCreditsForAppointment } from "@/actions/credits";
 import { Vonage } from "@vonage/server-sdk";
@@ -36,17 +36,52 @@ export async function bookAppointment(formData) {
   }
 
   try {
-    // Get the patient user
-    const patient = await db.user.findFirst({
+    // Get the current app user from Clerk ID
+    let currentAppUser = await db.user.findUnique({
       where: {
         clerkUserId: userId,
-        role: "PATIENT",
       },
     });
 
-    if (!patient) {
-      throw new Error("Patient not found");
+    if (!currentAppUser) {
+      const clerkProfile = await currentUser();
+
+      if (!clerkProfile?.primaryEmailAddress?.emailAddress) {
+        throw new Error("Patient not found");
+      }
+
+      const displayName =
+        [clerkProfile.firstName, clerkProfile.lastName]
+          .filter(Boolean)
+          .join(" ") || clerkProfile.username || "Patient";
+
+      currentAppUser = await db.user.create({
+        data: {
+          clerkUserId: clerkProfile.id,
+          email: clerkProfile.primaryEmailAddress.emailAddress,
+          name: displayName,
+          imageUrl: clerkProfile.imageUrl,
+          role: "PATIENT",
+        },
+      });
     }
+
+    // Allow first-time users to book as patient without requiring onboarding first.
+    if (currentAppUser.role === "DOCTOR" || currentAppUser.role === "ADMIN") {
+      throw new Error("Only patients can book appointments");
+    }
+
+    const patient =
+      currentAppUser.role === "UNASSIGNED"
+        ? await db.user.update({
+            where: {
+              id: currentAppUser.id,
+            },
+            data: {
+              role: "PATIENT",
+            },
+          })
+        : currentAppUser;
 
     // Parse form data
     const doctorId = formData.get("doctorId");
@@ -60,7 +95,7 @@ export async function bookAppointment(formData) {
     }
 
     // Check if the doctor exists and is verified
-    const doctor = await db.user.findUnique({
+    const doctor = await db.user.findFirst({
       where: {
         id: doctorId,
         role: "DOCTOR",
