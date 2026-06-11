@@ -37,11 +37,12 @@ export default function OnboardingPage() {
 
   // React Hook Form setup with Zod validation
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
+    register,       // Connect an <input> to the form
+    handleSubmit,    // Wrap your submit function with validation
+    formState: { errors },  // Object containing any validation errors
+    setValue,        // Manually set a field's value (for the Select dropdown)
+    watch,           // Watch a field's value in real-time
+
   } = useForm({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {

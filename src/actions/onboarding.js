@@ -38,7 +38,7 @@ export async function setUserRole(formData) {
         },
       });
       revalidatePath("/");
-      return { success: true, redirect: "/docters" };
+      return { success: true, redirect: "/doctors" };
     }
 
     if (role === "DOCTOR") {
