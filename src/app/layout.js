@@ -6,6 +6,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { dark } from "@clerk/themes";
 import { ThemeProvider } from "@/components/theme-provider";
+import AIChatWidget from "@/components/ai-chat-widget";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,6 +38,8 @@ export default function RootLayout({ children }) {
             <Toaster richColors />
 
             <Footer />
+            {/* AI Chat Widget — renders on every page as a floating button */}
+            <AIChatWidget />
           </ThemeProvider>
         </body>
       </html>

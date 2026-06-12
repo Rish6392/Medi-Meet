@@ -20,7 +20,7 @@ export async function getDoctorsBySpecialty(specialty) {
 
     return { doctors };
   } catch (error) {
-    console.error("Failed to fetch doctors by specialty:", error);
+    console.error("Failed to fetch doctors by specialty:", error.message || error);
     return { error: "Failed to fetch doctors" };
   }
 }

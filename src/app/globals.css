@@ -129,3 +129,434 @@
  bg-clip-text pb-1 pr-2
 }
 
+
+/* =============================================
+   AI CHAT WIDGET STYLES
+   ============================================= */
+
+/* --- Floating Action Button (FAB) --- */
+/* The circular button fixed to the bottom-right corner */
+.ai-chat-fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #059669, #0d9488);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(5, 150, 105, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* The breathing pulse animation draws attention */
+  animation: ai-fab-pulse 2s ease-in-out infinite;
+}
+
+.ai-chat-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(5, 150, 105, 0.6), 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Main bot icon inside the FAB */
+.ai-chat-fab-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: white;
+}
+
+/* Small sparkle icon in the top-right of the FAB for premium feel */
+.ai-chat-fab-sparkle {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 1rem;
+  height: 1rem;
+  color: #fbbf24;
+  animation: ai-sparkle-spin 3s linear infinite;
+}
+
+/* Breathing glow animation for the FAB */
+@keyframes ai-fab-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(5, 150, 105, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(5, 150, 105, 0.6), 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Slow spin for the sparkle icon */
+@keyframes ai-sparkle-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* --- Chat Panel (the main chat window) --- */
+/* Glassmorphism panel that slides up from the bottom-right */
+.ai-chat-panel {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  width: 380px;
+  height: 520px;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Glassmorphism: translucent background + blur */
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(5, 150, 105, 0.1);
+  /* Slide-up entrance animation */
+  animation: ai-panel-slide-up 0.3s ease-out;
+}
+
+/* On small screens, make the panel full-width */
+@media (max-width: 480px) {
+  .ai-chat-panel {
+    width: calc(100vw - 1.5rem);
+    right: 0.75rem;
+    bottom: 0.75rem;
+    height: 70vh;
+  }
+}
+
+/* Slide-up animation for the chat panel */
+@keyframes ai-panel-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* --- Header --- */
+.ai-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.15), rgba(13, 148, 136, 0.1));
+  border-bottom: 1px solid rgba(5, 150, 105, 0.15);
+}
+
+.ai-chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* Green pulsing dot = "online" status indicator */
+.ai-chat-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #10b981;
+  animation: ai-status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ai-status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.ai-chat-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+}
+
+.ai-chat-subtitle {
+  font-size: 0.7rem;
+  color: #6ee7b7;
+  margin-top: 1px;
+}
+
+/* Close button (X icon) */
+.ai-chat-close-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #a1a1aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-chat-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+
+/* --- Messages Area --- */
+/* Scrollable container for all chat bubbles */
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  /* Custom thin scrollbar that matches the dark theme */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(5, 150, 105, 0.3) transparent;
+}
+
+.ai-chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(5, 150, 105, 0.3);
+  border-radius: 4px;
+}
+
+/* Message bubble wrapper — controls left/right alignment */
+.ai-chat-bubble-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  /* Entrance animation for each new message */
+  animation: ai-message-fade-in 0.3s ease-out;
+}
+
+@keyframes ai-message-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* User messages align to the right */
+.ai-chat-bubble-user {
+  justify-content: flex-end;
+}
+
+/* AI messages align to the left */
+.ai-chat-bubble-ai {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* Small bot avatar next to AI messages */
+.ai-chat-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  border-radius: 9999px;
+  background: rgba(5, 150, 105, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6ee7b7;
+  margin-top: 2px;
+}
+
+/* The actual message bubble */
+.ai-chat-bubble {
+  max-width: 80%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
+  word-wrap: break-word;
+}
+
+/* User bubble — emerald gradient background */
+.ai-chat-bubble-user-bg {
+  background: linear-gradient(135deg, #059669, #0d9488);
+  color: white;
+  border-bottom-right-radius: 0.25rem; /* "tail" effect */
+}
+
+/* AI bubble — subtle dark background */
+.ai-chat-bubble-ai-bg {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e4e4e7;
+  border-bottom-left-radius: 0.25rem; /* "tail" effect */
+}
+
+.ai-chat-bubble-text {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+
+/* --- Specialty Recommendation Card --- */
+/* Clickable card that appears when AI recommends a specialty */
+.ai-chat-specialty-link {
+  display: block;
+  margin-top: 0.625rem;
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  background: rgba(5, 150, 105, 0.1);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.ai-chat-specialty-link:hover {
+  background: rgba(5, 150, 105, 0.2);
+  border-color: rgba(5, 150, 105, 0.4);
+  transform: translateX(2px); /* Slight nudge right on hover */
+}
+
+.ai-chat-specialty-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-chat-specialty-label {
+  display: block;
+  font-size: 0.65rem;
+  color: #6ee7b7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.ai-chat-specialty-name {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* Confidence level badge (high/medium/low) */
+.ai-chat-confidence {
+  display: inline-block;
+  margin-top: 0.375rem;
+  font-size: 0.625rem;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+.ai-chat-confidence-high {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+.ai-chat-confidence-medium {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fcd34d;
+}
+
+.ai-chat-confidence-low {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+
+/* --- Loading indicator --- */
+.ai-chat-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-chat-loading-text {
+  font-size: 0.8125rem;
+  color: #a1a1aa;
+}
+
+
+/* --- Input Area (bottom of panel) --- */
+.ai-chat-input-area {
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.ai-chat-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.375rem 0.375rem 0.875rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.2s ease;
+}
+
+/* Glow effect when the input is focused */
+.ai-chat-input-wrapper:focus-within {
+  border-color: rgba(5, 150, 105, 0.5);
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1);
+}
+
+.ai-chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 0.8125rem;
+  min-width: 0;
+}
+
+.ai-chat-input::placeholder {
+  color: #71717a;
+}
+
+/* Circular send button */
+.ai-chat-send-btn {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: 9999px;
+  border: none;
+  background: #059669;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-chat-send-btn:hover:not(:disabled) {
+  background: #047857;
+  transform: scale(1.05);
+}
+
+/* Disabled state for the send button (no text / loading) */
+.ai-chat-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Legal disclaimer at the very bottom */
+.ai-chat-disclaimer {
+  text-align: center;
+  font-size: 0.6rem;
+  color: #52525b;
+  margin-top: 0.5rem;
+}
+
