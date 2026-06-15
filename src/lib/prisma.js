@@ -3,12 +3,17 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
-// Required: tell Neon to use WebSockets for database connections.
-// This bypasses TCP port 5432 (often blocked on restricted networks)
-// and routes traffic over HTTPS (port 443) instead.
+// Required for WebSocket connections (works in both local and Vercel serverless)
 neonConfig.webSocketConstructor = ws;
 
 const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error(
+    "DATABASE_URL environment variable is not set. " +
+    "Please add it to your Vercel project settings or .env file."
+  );
+}
 
 // Create PrismaClient with the Neon serverless adapter.
 // Since Prisma 6.6.0+, we pass the connectionString directly
