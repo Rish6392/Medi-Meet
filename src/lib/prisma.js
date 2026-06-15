@@ -1,10 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
-
-// Required for WebSocket connections (works in both local and Vercel serverless)
-neonConfig.webSocketConstructor = ws;
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -16,8 +11,8 @@ if (!connectionString) {
 }
 
 // Create PrismaClient with the Neon serverless adapter.
-// Since Prisma 6.6.0+, we pass the connectionString directly
-// to PrismaNeon instead of creating a Pool manually.
+// Since Prisma 6.6.0+, PrismaNeon handles connections internally
+// using HTTP (no WebSocket/ws dependency needed).
 const createPrismaClient = () => {
   const adapter = new PrismaNeon({ connectionString });
   return new PrismaClient({ adapter });
