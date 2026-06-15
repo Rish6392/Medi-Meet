@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/actions/onboarding";
+import { redirect } from "next/navigation";
 import React from "react";
 
 const OnboardingLayout = async ({ children }) => {
