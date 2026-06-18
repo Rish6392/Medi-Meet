@@ -70,7 +70,7 @@ The "confidence" field indicates how confident you are in the recommendation.`;
  */
 export async function getAIResponse(userMessage, chatHistory = []) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
 
     // Safety check: make sure the API key is set
     if (!apiKey || apiKey === "your_gemini_api_key_here") {
@@ -81,36 +81,35 @@ export async function getAIResponse(userMessage, chatHistory = []) {
     }
 
     // Build conversation history so the AI remembers previous messages.
-    // Each message has a "role" (user or model) and "parts" (the text content).
-    const contents = chatHistory.map((msg) => ({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
-    }));
+    // Groq uses OpenAI-compatible format with "messages" array.
+    const messages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...chatHistory.map((msg) => ({
+        role: msg.role === "user" ? "user" : "assistant",
+        content: msg.content,
+      })),
+      { role: "user", content: userMessage },
+    ];
 
-    // Add the current user message to the conversation
-    contents.push({
-      role: "user",
-      parts: [{ text: userMessage }],
-    });
+    // Groq API endpoint — using llama-3.3-70b-versatile (fast and free tier available)
+    const url = "https://api.groq.com/openai/v1/chat/completions";
 
-    // The Gemini REST API endpoint — "gemini-2.5-flash" is fast, smart, and FREE
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-    // Send the request to Google's Gemini API
+    // Send the request to Groq API
     // Helper: make the API request with retry on rate limit (429)
-    // New API keys sometimes hit rate limits for the first few minutes
     let response;
     for (let attempt = 0; attempt < 3; attempt++) {
       response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
         body: JSON.stringify({
-          // System instruction tells the AI its role BEFORE any user messages
-          system_instruction: {
-            parts: [{ text: SYSTEM_PROMPT }],
-          },
-          // The full conversation (history + new message)
-          contents,
+          model: "llama-3.3-70b-versatile",
+          messages,
+          temperature: 0.7,
+          max_tokens: 512,
+          response_format: { type: "json_object" },
         }),
       });
 
@@ -126,7 +125,7 @@ export async function getAIResponse(userMessage, chatHistory = []) {
     // Check if the API request itself failed (wrong key, rate limit, etc.)
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error("Gemini API Error:", response.status, errorData);
+      console.error("Groq API Error:", response.status, errorData);
 
       // Give user a specific message for rate limiting
       if (response.status === 429) {
@@ -143,27 +142,39 @@ export async function getAIResponse(userMessage, chatHistory = []) {
     const data = await response.json();
 
     // Extract the AI's text response from the nested JSON structure
-    // Gemini returns: { candidates: [{ content: { parts: [{ text: "..." }] } }] }
-    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Groq returns: { choices: [{ message: { content: "..." } }] }
+    const responseText = data.choices?.[0]?.message?.content;
 
     if (!responseText) {
-      console.error("No response text from Gemini:", JSON.stringify(data));
+      console.error("No response text from Groq:", JSON.stringify(data));
       return {
         error: "I didn't get a response. Please try again.",
       };
     }
 
     // Try to parse the AI's response as JSON.
-    // The AI is instructed to respond in JSON, but sometimes it wraps
-    // the JSON in markdown code blocks (```json ... ```), so we clean that.
+    // The AI is instructed to respond in JSON, but sometimes wraps it
+    // in markdown code blocks or mixes plain text with JSON. We handle all cases.
     try {
-      // Remove markdown code block wrappers if present
-      const cleanedText = responseText
+      // Step 1: Remove markdown code block wrappers if present
+      let cleanedText = responseText
         .replace(/```json\n?/g, "")
         .replace(/```\n?/g, "")
         .trim();
 
-      const parsed = JSON.parse(cleanedText);
+      // Step 2: Try direct JSON parse first
+      let parsed;
+      try {
+        parsed = JSON.parse(cleanedText);
+      } catch {
+        // Step 3: If direct parse fails, extract JSON object from mixed text
+        const jsonMatch = cleanedText.match(/\{[\s\S]*"message"\s*:[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("No JSON found in response");
+        }
+      }
 
       // Validate that the recommended specialty actually exists on our platform.
       // This prevents broken links if the AI hallucinates a specialty name.
@@ -177,10 +188,16 @@ export async function getAIResponse(userMessage, chatHistory = []) {
         confidence: parsed.confidence || null,
       };
     } catch {
-      // If JSON parsing fails, just return the raw text as a message.
-      // This is a fallback so the chat never completely breaks.
+      // If all JSON parsing fails, clean up the raw text as best we can.
+      // Remove any JSON-looking fragments so the user sees only the readable part.
+      const cleanMessage = responseText
+        .replace(/```json\n?/g, "")
+        .replace(/```\n?/g, "")
+        .replace(/\{[\s\S]*"message"\s*:[\s\S]*\}/g, "")
+        .trim();
+
       return {
-        message: responseText,
+        message: cleanMessage || responseText,
         specialty: null,
         confidence: null,
       };

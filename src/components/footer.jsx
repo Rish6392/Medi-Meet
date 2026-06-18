@@ -49,7 +49,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-emerald-500 mt-1" />
-                <span>123 Health Avenue, Medical District<br />New York, NY 10001</span>
+                <span>123 Lal KIla Chok, Medical Bhawan<br />New Delhi, ND 10001</span>
               </li>
             </ul>
           </div>
@@ -70,7 +70,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} MediMeet. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            Made with <Heart className="h-4 w-4 text-red-500 fill-red-500" /> by Rishabh
+            Made with <Heart className="h-4 w-4 text-red-500 fill-red-500" /> Beautiful Purpose.
           </p>
         </div>
       </div>
